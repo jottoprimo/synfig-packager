@@ -5,8 +5,9 @@ import sys, os, shutil
 global parslist
 
 parslist=[]
+unparsed=[]
 filelist=[]
-parslist2=[]
+#parslist2=[]
 
 def sifparse(filename):
 	#print "Parsing file %s..." % (filename)
@@ -65,10 +66,49 @@ def filedit(cname):
 				filedit(fname2)
 	file2.close()
 
-a=sys.argv[1]
+a=sys.argv[1]	
 a1=a[:a.find('.sif')]
 os.mkdir(a1)
+unparsed.append(a)
 co=a1+'/'+a
 shutil.copy(a, co)
-filedit(co)
-sifparse(a)
+flag_filename=False
+#filedit(co)
+#sifparse(a)
+while len(unparsed)>0:
+	filename=unparsed.pop()
+	print "Parsing file: %s" %(filename)
+	parslist.append(filename)
+	sifdir=filename[:filename.find(os.path.basename(filename))]
+	file=open(filename)
+	massiv=file.readlines()
+	for i, line in enumerate(massiv):
+		if line.find('<param name="filename">')<>-1:
+			flag_filename=True
+		if line.find('</param>')<>-1:
+			flag_filename=False
+		if flag_filename and line.find('<string>')<>-1:
+			str=massiv[i]
+			pos1=str.find('<string>')+len('<string>')
+			pos2=str.find('</string>')
+			fname=str[pos1:pos2]
+			#print "       Join input:",sifdir,fn 
+			fn=os.path.join(sifdir ,fname)
+			fn=os.path.abspath(fn)
+			if not fn in filelist:
+				print fn
+				fname=os.path.basename(fname)
+				co=a1+'/'+fname
+				shutil.copy(fn, co)
+			filelist.append(fn)
+		if line.find('<param name="canvas" use=')<>-1:
+			pos1=line.find('<param name="canvas" use="')+len('<param name="canvas" use="')
+			pos2=line.find('#"/>')
+			fname=line[pos1:pos2]
+			fn=os.path.abspath(fname)
+			print fn
+			if not fn in parslist:
+				unparsed.append(fname)
+				fname=os.path.basename(fname)
+				co=a1+'/'+fname
+				shutil.copy(fn, co)
