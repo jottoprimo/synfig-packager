@@ -1,4 +1,5 @@
 #!python
+# -*- coding: utf-8 -*-
 
 import sys, os, shutil
 
@@ -106,6 +107,13 @@ while len(unparsed)>0:
 			#print "       Join input:",sifdir,fn 
 			fn=os.path.join(sifdir ,fnamenotsif)
 			fn=os.path.abspath(fn)
+			while fn.find('&#x')<>-1:
+				decoder=fn[fn.find('&#x')+3:fn.find(';')]
+				print decoder
+				decoder = decoder.decode('utf-8')
+				code=int(decoder, 16)
+				decoder=unichr(code)
+				fn=fn.replace(fn[fn.find('&#x'):fn.find(';')], decoder)
 			if not fn in filelist:
 				print fn
 				fnamenotsif=os.path.basename(fnamenotsif)
