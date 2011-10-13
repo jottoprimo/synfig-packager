@@ -160,7 +160,8 @@ while len(unparsed)>0:
 Zip=zipfile.ZipFile(a1+'.zip', 'w')	
 zipfiles=os.listdir(a1)
 for zipname in zipfiles:
-	print zipname
+	#print zipname
 	Zip.write(a1+'/'+zipname)
+	os.remove(a1+'/'+zipname)
 Zip.close()
-				
+os.removedirs(a1)
