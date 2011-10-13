@@ -1,7 +1,6 @@
 #!python
-# -*- coding: utf-8 -*-
 
-import sys, os, shutil
+import sys, os, shutil, re
 
 global parslist
 
@@ -9,6 +8,16 @@ parslist=[]
 unparsed=[]
 filelist=[]
 #parslist2=[]
+
+def _callback(matches):
+    id = matches.group(1)
+    try:
+        return unichr(int(id,16))
+    except:
+        return id
+
+def decode_unicode_references(data):
+    return re.sub("&#x([a-zA-Z0-9]+)(;|(?=\s))", _callback, data)
 
 def sifparse(filename):
 	#print "Parsing file %s..." % (filename)
@@ -107,24 +116,31 @@ while len(unparsed)>0:
 			#print "       Join input:",sifdir,fn 
 			fn=os.path.join(sifdir ,fnamenotsif)
 			fn=os.path.abspath(fn)
-			while fn.find('&#x')<>-1:
-				decoder=fn[fn.find('&#x')+3:fn.find(';')]
-				print decoder
-				decoder = decoder.decode('utf-8')
-				code=int(decoder, 16)
-				decoder=unichr(code)
-				fn=fn.replace(fn[fn.find('&#x'):fn.find(';')], decoder)
+			if fn.find('&#x')<>-1:
+				#decoder=fn[fn.find('&#x')+3:fn.find(';')]
+				#print decoder
+				#decoder = decoder.decode('utf-8')
+				#code=int(decoder, 16)
+				#decoder=unichr(code)
+				#fn=fn.replace(fn[fn.find('&#x'):fn.find(';')], decoder)
+				fn=decode_unicode_references(fn)
+				fn=fn.encode('utf-8')
 			if not fn in filelist:
 				print fn
-				fnamenotsif=os.path.basename(fnamenotsif)
+				fnamenotsif=os.path.basename(fn) # Была замена fnamenotsif на fn
 				co=a1+'/'+fnamenotsif
+				print 'aa'+co
 				shutil.copy(fn, co)
 			filelist.append(fn)
 			file2.write('<string>'+fnamenotsif+'</string>'+"\n")
-		elif line.find('<param name="canvas" use=')<>-1:
-			pos1=line.find('<param name="canvas" use="')+len('<param name="canvas" use="')
-			pos2=line.find('#"/>')
-			fname=line[pos1:pos2]
+		elif line.find('<param name=')<>-1 and line.find('use=')<>-1 and line.find('.sif')<>-1:
+			pos_param_name=line.find('<param name=')
+			pos_use=line.find('use="')+len('use="')
+			if line[pos_param_name:pos_use].find('color')<>-1:
+				pos_end_file=line.find('#:')
+			if line[pos_param_name:pos_use].find('canvas')<>-1:
+				pos_end_file=line.find('#"/>')
+			fname=line[pos_use:pos_end_file]
 			fn=os.path.join(dname, fname)
 			#print fname, '  ', dname
 			print fn
