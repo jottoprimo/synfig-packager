@@ -1,12 +1,15 @@
 #!python
 
-import sys, os, shutil, re
+# -*- coding: utf-8 -*-
+
+import sys, os, shutil, re, zipfile
 
 global parslist
 
 parslist=[]
 unparsed=[]
 filelist=[]
+zipfiles=[]
 #parslist2=[]
 
 def _callback(matches):
@@ -127,9 +130,9 @@ while len(unparsed)>0:
 				fn=fn.encode('utf-8')
 			if not fn in filelist:
 				print fn
-				fnamenotsif=os.path.basename(fn) # Была замена fnamenotsif на fn
+				fnamenotsif=os.path.basename(fn)  
 				co=a1+'/'+fnamenotsif
-				print 'aa'+co
+				#print 'aa'+co
 				shutil.copy(fn, co)
 			filelist.append(fn)
 			file2.write('<string>'+fnamenotsif+'</string>'+"\n")
@@ -153,4 +156,11 @@ while len(unparsed)>0:
 		else:
 			file2.write(line)
 	file2.close()
+
+Zip=zipfile.ZipFile(a1+'.zip', 'w')	
+zipfiles=os.listdir(a1)
+for zipname in zipfiles:
+	print zipname
+	Zip.write(a1+'/'+zipname)
+Zip.close()
 				
