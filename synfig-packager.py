@@ -136,13 +136,13 @@ while len(unparsed)>0:
 				shutil.copy(fn, co)
 			filelist.append(fn)
 			file2.write('<string>'+fnamenotsif+'</string>'+"\n")
-		elif line.find('<param name=')<>-1 and line.find('use=')<>-1 and line.find('.sif')<>-1:
-			pos_param_name=line.find('<param name=')
+		elif line.find('<param name="')<>-1 and line.find('use=')<>-1 and line.find('.sif')<>-1:
+			pos_param_name=line.find('<param name="')
 			pos_use=line.find('use="')+len('use="')
-			if line[pos_param_name:pos_use].find('color')<>-1:
+			if line.find('#:')<>-1:
 				pos_end_file=line.find('#:')
-			if line[pos_param_name:pos_use].find('canvas')<>-1:
-				pos_end_file=line.find('#"/>')
+			#if line[pos_param_name:pos_use].find('canvas')<>-1:
+			#	pos_end_file=line.find('#"/>')
 			fname=line[pos_use:pos_end_file]
 			fn=os.path.join(dname, fname)
 			#print fname, '  ', dname
@@ -152,7 +152,7 @@ while len(unparsed)>0:
 				fname=os.path.basename(fname)
 				co=a1+'/'+fname
 				#shutil.copy(fn, co)
-				file2.write('<param name="canvas" use="'+fname+'#"/>'+"\n")
+				file2.write(line[0:pos_use]+fname+line[pos_end_file:len(line)]+"\n")
 		else:
 			file2.write(line)
 	file2.close()
