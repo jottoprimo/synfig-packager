@@ -88,26 +88,26 @@ else:
 	os.mkdir(a1)
 
 unparsed.append(a)
-dirname=os.path.basename(a)
+filename=os.path.basename(a)
 #co=a1+'/'+dirname
 #shutil.copy(a, co)
 #flag_filename=False
-dname=a[:a.find(dirname)]
+dname=a[:a.find(filename)]
 #fname=dirname
 #filedit(co)
 #sifparse(a)
 while len(unparsed)>0:
-	filename=unparsed.pop()
-	print "Parsing file: %s" %(filename)
-	parslist.append(filename)
-	sifdir=filename[:filename.find(os.path.basename(filename))]
-	file=open(filename)
-	dirname=os.path.basename(filename)
-	co=a1+'/'+dirname
+	filepath=unparsed.pop()
+	print "Parsing file: %s" %(filepath)
+	parslist.append(filepath)
+	sifdir=filepath[:filepath.find(os.path.basename(filepath))]
+	file=open(filepath)
+	filename=os.path.basename(filepath)
+	co=a1+'/'+filename
 	shutil.copy(a, co)
 	flag_filename=False
-	fname=a[:a.find(dirname)]
-	fname=dirname
+	#fname=a[:a.find(filename)]
+	fname=filename
 	print "---",a1+'/'+fname
 	file2=open(a1+'/'+fname, 'w')
 	massiv=file.readlines()
@@ -125,6 +125,7 @@ while len(unparsed)>0:
 			fnamenotsif=str[pos1:pos2]
 			#print "       Join input:",sifdir,fn 
 			fn=os.path.join(sifdir ,fnamenotsif)
+			#print "+++",sifdir,"___",fnamenotsif
 			fn=os.path.abspath(fn)
 			if fn.find('&#x')<>-1:
 				#decoder=fn[fn.find('&#x')+3:fn.find(';')]
