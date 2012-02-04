@@ -89,11 +89,11 @@ else:
 
 unparsed.append(a)
 dirname=os.path.basename(a)
-co=a1+'/'+dirname
-shutil.copy(a, co)
-flag_filename=False
+#co=a1+'/'+dirname
+#shutil.copy(a, co)
+#flag_filename=False
 dname=a[:a.find(dirname)]
-fname=dirname
+#fname=dirname
 #filedit(co)
 #sifparse(a)
 while len(unparsed)>0:
@@ -102,6 +102,13 @@ while len(unparsed)>0:
 	parslist.append(filename)
 	sifdir=filename[:filename.find(os.path.basename(filename))]
 	file=open(filename)
+	dirname=os.path.basename(filename)
+	co=a1+'/'+dirname
+	shutil.copy(a, co)
+	flag_filename=False
+	fname=a[:a.find(dirname)]
+	fname=dirname
+	print "---",a1+'/'+fname
 	file2=open(a1+'/'+fname, 'w')
 	massiv=file.readlines()
 	for i, line in enumerate(massiv):
@@ -141,6 +148,8 @@ while len(unparsed)>0:
 			pos_use=line.find('use="')+len('use="')
 			if line.find('#:')<>-1:
 				pos_end_file=line.find('#:')
+			if line.find('#"')<>-1:
+				pos_end_file=line.find('#"')
 			#if line[pos_param_name:pos_use].find('canvas')<>-1:
 			#	pos_end_file=line.find('#"/>')
 			fname=line[pos_use:pos_end_file]
@@ -156,6 +165,8 @@ while len(unparsed)>0:
 		else:
 			file2.write(line)
 	file2.close()
+	print "End parsing file %s..." % (filename)
+	file.close()
 
 Zip=zipfile.ZipFile(a1+'.zip', 'w')	
 zipfiles=os.listdir(a1)
