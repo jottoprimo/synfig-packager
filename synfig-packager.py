@@ -121,10 +121,11 @@ while len(unparsed)>0:
 		elif line.find('</param>')<>-1:
 			flag_filename=False
 			file2.write(line)
-		elif flag_filename and line.find('<string>')<>-1:
+		elif flag_filename and line.find('<string')<>-1:
 			str=massiv[i]
-			pos1=str.find('<string>')+len('<string>')
+			pos1=str.find('>')+1
 			pos2=str.find('</string>')
+			#print "+++ ",str[pos1:pos2]
 			fnamenotsif=str[pos1:pos2]
 			#print "       Join input:",sifdir,fn 
 			fn=os.path.join(sifdir ,fnamenotsif)
