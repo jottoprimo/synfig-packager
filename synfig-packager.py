@@ -2,7 +2,7 @@
 
 # -*- coding: utf-8 -*-
 
-import sys, os, shutil, re, zipfile
+import sys, os, shutil, re, zipfile, random
 
 global parslist
 
@@ -79,8 +79,10 @@ def filedit(cname):
 				filedit(fname2)
 	file2.close()
 
-a=sys.argv[1]	
-a1=a[:a.find('.sif')]
+a=sys.argv[1]
+a1=os.path.basename(a)	
+a1=a1[:a1.find('.sif')]
+a1="/tmp/"+a1+'_'+"%d" % (random.randint(1,100))#a[:a.find('.sif')]
 if os.path.exists(a1):
 	print "error: %s already exists" % (a1)
 	sys.exit(1)
@@ -108,6 +110,7 @@ while len(unparsed)>0:
 	flag_filename=False
 	#fname=a[:a.find(filename)]
 	fname=filename
+	a1="/tmp/"+os.path.basename(a1)
 	print "---",a1+'/'+fname
 	file2=open(a1+'/'+fname, 'w')
 	massiv=file.readlines()
@@ -172,8 +175,8 @@ while len(unparsed)>0:
 Zip=zipfile.ZipFile(a1+'.zip', 'w')	
 zipfiles=os.listdir(a1)
 for zipname in zipfiles:
-	#print zipname
-	Zip.write(a1+'/'+zipname)
+	print "Add to archive --- "+a1+'/'+zipname
+	Zip.write(a1+'/'+zipname,zipname)
 	os.remove(a1+'/'+zipname)
 Zip.close()
 os.removedirs(a1)
