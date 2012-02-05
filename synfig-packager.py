@@ -111,7 +111,7 @@ while len(unparsed)>0:
 	#fname=a[:a.find(filename)]
 	fname=filename
 	a1="/tmp/"+os.path.basename(a1)
-	print "---",a1+'/'+fname
+	#print "---",a1+'/'+fname
 	file2=open(a1+'/'+fname, 'w')
 	massiv=file.readlines()
 	for i, line in enumerate(massiv):
@@ -144,8 +144,18 @@ while len(unparsed)>0:
 				print fn
 				fnamenotsif=os.path.basename(fn)  
 				co=a1+'/'+fnamenotsif
+				#print '+++ ', fn
 				#print 'aa'+co
 				shutil.copy(fn, co)
+				if line.find('.lst')<>-1:
+					file_lst=open(fn)
+					lst_files=file_lst.readlines()
+					for ii, image_name in enumerate(lst_files):
+							if image_name.find('.')<>-1:
+								image_path=fn[:fn.find('.lst')-len(fnamenotsif)+4]+image_name[:len(image_name)-1]
+								co=a1+'/'+image_name
+								#print '--- ',co
+								shutil.copy(image_path, co)
 			filelist.append(fn)
 			file2.write('<string>'+fnamenotsif+'</string>'+"\n")
 		elif line.find('<param name="')<>-1 and line.find('use=')<>-1 and line.find('.sif')<>-1:
