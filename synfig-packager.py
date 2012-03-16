@@ -81,35 +81,40 @@ def filedit(cname):
 	file2.close()
 	
 def copy_image(inputt, outputt):
+	print "=== Copy image called! ==="
 	global lst_image_file
-	input_name=os.path.basename(inputt)
-	output_name=input_name
-	count1=0
-	while output_name in filelist2:
-		count1=count1+1
-		output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
-		output_name=output_name+input_name[input_name.find('.'):]
-	filelist2.append(output_name)
-	print '-------',inputt
-	shutil.copy(inputt, outputt+'/'+output_name)
-	lst_image_file=output_name
-	if output_name.find('.lst')<>-1:
-		file2.write('<string>'+output_name+'</string>'+"\n")
-		file_lst=open(inputt)
-		file_lst_out=open(outputt+'/'+output_name, 'w')
-		lst_files=file_lst.readlines()
-		for ii, image_name in enumerate(lst_files):
-			if image_name.find('.')<>-1:
-				print "!!!",inputt
-				image_path=inputt[:inputt.find('.lst')-len(input_name)+4]+image_name[:len(image_name)-1]
-				#co=a1+'/'+image_name
-				#copy_image(image_path, a1)
-				print '+++' + image_path
-				file_lst_out.write(copy_image(image_path, a1) + "\n")
-				#shutil.copy(image_path, co)
-			else:
-				file_lst_out.write(image_name)
-	return output_name
+	if not inputt in filelist:
+		input_name=os.path.basename(inputt)
+		output_name=input_name
+		count1=0
+		while output_name in filelist2:
+			count1=count1+1
+			output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
+			output_name=output_name+input_name[input_name.find('.'):]
+		filelist2.append(output_name)
+		filelist.append(inputt)
+		print '-------',inputt
+		shutil.copy(inputt, outputt+'/'+output_name)
+		lst_image_file=output_name
+		if output_name.find('.lst')<>-1:
+			#file2.write('<string>'+output_name+'</string>'+"\n")
+			file_lst=open(inputt)
+			file_lst_out=open(outputt+'/'+output_name, 'w')
+			lst_files=file_lst.readlines()
+			for ii, image_name in enumerate(lst_files):
+				if image_name.find('.')<>-1:
+					print "!!!",inputt
+					image_path=inputt[:inputt.find('.lst')-len(input_name)+4]+image_name[:len(image_name)-1]
+					#co=a1+'/'+image_name
+					#copy_image(image_path, a1)
+					print '+++' + image_path
+					file_lst_out.write(copy_image(image_path, a1) + "\n")
+					#shutil.copy(image_path, co)
+				else:
+					file_lst_out.write(image_name)
+		return output_name
+	else:
+		return filelist2[filelist.index(inputt)]
 
 a=sys.argv[1]
 a1=os.path.basename(a)	
@@ -154,6 +159,7 @@ while len(unparsed)>0:
 			flag_filename=False
 			file2.write(line)
 		elif flag_filename and line.find('<string')<>-1:
+			print 'line=',line
 			str=massiv[i]
 			pos1=str.find('>')+1
 			pos2=str.find('</string>')
@@ -188,9 +194,10 @@ while len(unparsed)>0:
 				#				co=a1+'/'+image_name
 								#print '--- ',co
 				#				shutil.copy(image_path, co)
-			#print '************',line
-			file2.write('<string>'+copy_image(fn,a1)+'</string>'+"\n")
-			filelist.append(fn)
+			result_filename=copy_image(fn,a1)
+			print '************',result_filename
+			file2.write('<string>'+result_filename+'</string>'+"\n")
+			#filelist.append(fn)
 		elif line.find('<param name="')<>-1 and line.find('use=')<>-1 and line.find('.sif')<>-1:
 			pos_param_name=line.find('<param name="')
 			pos_use=line.find('use="')+len('use="')
