@@ -1,5 +1,4 @@
 #!python
-
 # -*- coding: utf-8 -*-
 
 import sys, os, shutil, re, zipfile, random
@@ -8,8 +7,10 @@ global parslist
 
 parslist=[]
 unparsed=[]
-filelist=[]
+filelist=[] # список файлов которые уже скопировали
+filelist2=[] # список скопированных имён файлов чтобы не повторялись
 zipfiles=[]
+lst_image_file=''
 #parslist2=[]
 
 def _callback(matches):
@@ -78,6 +79,37 @@ def filedit(cname):
 			if not fname2 in parslist2:
 				filedit(fname2)
 	file2.close()
+	
+def copy_image(inputt, outputt):
+	global lst_image_file
+	input_name=os.path.basename(inputt)
+	output_name=input_name
+	count1=0
+	while output_name in filelist2:
+		count1=count1+1
+		output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
+		output_name=output_name+input_name[input_name.find('.'):]
+	filelist2.append(output_name)
+	print '-------',inputt
+	shutil.copy(inputt, outputt+'/'+output_name)
+	lst_image_file=output_name
+	if output_name.find('.lst')<>-1:
+		file2.write('<string>'+output_name+'</string>'+"\n")
+		file_lst=open(inputt)
+		file_lst_out=open(outputt+'/'+output_name, 'w')
+		lst_files=file_lst.readlines()
+		for ii, image_name in enumerate(lst_files):
+			if image_name.find('.')<>-1:
+				print "!!!",inputt
+				image_path=inputt[:inputt.find('.lst')-len(input_name)+4]+image_name[:len(image_name)-1]
+				#co=a1+'/'+image_name
+				#copy_image(image_path, a1)
+				print '+++' + image_path
+				file_lst_out.write(copy_image(image_path, a1) + "\n")
+				#shutil.copy(image_path, co)
+			else:
+				file_lst_out.write(image_name)
+	return output_name
 
 a=sys.argv[1]
 a1=os.path.basename(a)	
@@ -146,18 +178,19 @@ while len(unparsed)>0:
 				co=a1+'/'+fnamenotsif
 				#print '+++ ', fn
 				#print 'aa'+co
-				shutil.copy(fn, co)
-				if line.find('.lst')<>-1:
-					file_lst=open(fn)
-					lst_files=file_lst.readlines()
-					for ii, image_name in enumerate(lst_files):
-							if image_name.find('.')<>-1:
-								image_path=fn[:fn.find('.lst')-len(fnamenotsif)+4]+image_name[:len(image_name)-1]
-								co=a1+'/'+image_name
+				#shutil.copy(fn, co)
+				#if line.find('.lst')<>-1:
+				#	file_lst=open(fn)
+				#	lst_files=file_lst.readlines()
+				#	for ii, image_name in enumerate(lst_files):
+				#			if image_name.find('.')<>-1:
+				#				image_path=fn[:fn.find('.lst')-len(fnamenotsif)+4]+image_name[:len(image_name)-1]
+				#				co=a1+'/'+image_name
 								#print '--- ',co
-								shutil.copy(image_path, co)
+				#				shutil.copy(image_path, co)
+			#print '************',line
+			file2.write('<string>'+copy_image(fn,a1)+'</string>'+"\n")
 			filelist.append(fn)
-			file2.write('<string>'+fnamenotsif+'</string>'+"\n")
 		elif line.find('<param name="')<>-1 and line.find('use=')<>-1 and line.find('.sif')<>-1:
 			pos_param_name=line.find('<param name="')
 			pos_use=line.find('use="')+len('use="')
