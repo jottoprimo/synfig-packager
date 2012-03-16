@@ -10,6 +10,8 @@ unparsed=[]
 filelist=[] # список файлов которые уже скопировали
 filelist2=[] # список скопированных имён файлов чтобы не повторялись
 zipfiles=[]
+siflist=[]
+siflist2=[]
 lst_image_file=''
 #parslist2=[]
 
@@ -79,7 +81,7 @@ def filedit(cname):
 			if not fname2 in parslist2:
 				filedit(fname2)
 	file2.close()
-	
+
 def copy_image(inputt, outputt):
 	print "=== Copy image called! ==="
 	global lst_image_file
@@ -115,11 +117,31 @@ def copy_image(inputt, outputt):
 		return output_name
 	else:
 		return filelist2[filelist.index(inputt)]
+		
+def copy_sif(inputt, outputt):
+	if not inputt in siflist:
+		input_name=os.path.basename(inputt)
+		output_name=input_name
+		count1=0
+		while output_name in siflist2:
+			count1=count1+1
+			output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
+			output_name=output_name+input_name[input_name.find('.'):]
+		siflist.append(inputt)
+		siflist2.append(output_name)
+		shutil.copy(inputt, outputt+'/'+output_name)
+		return output_name
+	else:
+		return siflist2[siflist.index(inputt)]
+		
+		
+		
 
 a=sys.argv[1]
 a1=os.path.basename(a)	
 a1=a1[:a1.find('.sif')]
 a1="/tmp/"+a1+'_'+"%d" % (random.randint(1,100))#a[:a.find('.sif')]
+a1=sys.argv[2]
 if os.path.exists(a1):
 	print "error: %s already exists" % (a1)
 	sys.exit(1)
@@ -147,7 +169,7 @@ while len(unparsed)>0:
 	flag_filename=False
 	#fname=a[:a.find(filename)]
 	fname=filename
-	a1="/tmp/"+os.path.basename(a1)
+	#a1="/tmp/"+os.path.basename(a1)
 	#print "---",a1+'/'+fname
 	file2=open(a1+'/'+fname, 'w')
 	massiv=file.readlines()
@@ -215,8 +237,9 @@ while len(unparsed)>0:
 				unparsed.append(fn)
 				fname=os.path.basename(fname)
 				co=a1+'/'+fname
+				result_filename=copy_sif(fn,a1)
 				#shutil.copy(fn, co)
-				file2.write(line[0:pos_use]+fname+line[pos_end_file:len(line)]+"\n")
+				file2.write(line[0:pos_use]+result_filename+line[pos_end_file:len(line)]+"\n")
 		else:
 			file2.write(line)
 	file2.close()
