@@ -9,6 +9,7 @@ parslist=[]
 unparsed=[]
 filelist=[] # список файлов которые уже скопировали
 filelist2=[] # список скопированных имён файлов чтобы не повторялись
+filelist_path=[]
 zipfiles=[]
 siflist=[]
 siflist2=[]
@@ -93,14 +94,21 @@ def copy_image(inputt, outputt):
 			count1=count1+1
 			output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
 			output_name=output_name+input_name[input_name.find('.'):]
-		filelist2.append(output_name)
+		print '% ', output_name
 		filelist.append(inputt)
+		filelist2.append(output_name)
 		print '-------',inputt
 		shutil.copy(inputt, outputt+'/'+output_name)
 		lst_image_file=output_name
 		if output_name.find('.lst')<>-1:
 			#file2.write('<string>'+output_name+'</string>'+"\n")
 			file_lst=open(inputt)
+			if not os.path.exists(outputt+'/sequences/'):
+				os.mkdir(outputt+'/sequences/')
+			output_path=outputt+'/sequences/'+output_name[:output_name.find('.')]
+			os.mkdir(outputt+'/sequences/'+output_name[:output_name.find('.')]+'/')
+			output_name='sequences/'+output_name[:output_name.find('.')]+'/'+output_name
+			filelist_path.append(output_name)
 			file_lst_out=open(outputt+'/'+output_name, 'w')
 			lst_files=file_lst.readlines()
 			for ii, image_name in enumerate(lst_files):
@@ -110,13 +118,19 @@ def copy_image(inputt, outputt):
 					#co=a1+'/'+image_name
 					#copy_image(image_path, a1)
 					print '+++' + image_path
-					file_lst_out.write(copy_image(image_path, a1) + "\n")
+					file_lst_out.write(copy_image(image_path, output_path[:len(output_path)]) + "\n")
 					#shutil.copy(image_path, co)
 				else:
 					file_lst_out.write(image_name)
+		else:
+			filelist_path.append(output_name)
+		print '######### ',output_name
 		return output_name
 	else:
-		return filelist2[filelist.index(inputt)]
+		return filelist_path[filelist.index(inputt)]
+#def lst(inputt, outputt):
+	
+	
 		
 def copy_sif(inputt, outputt):
 	if not inputt in siflist:
@@ -142,6 +156,7 @@ a1=os.path.basename(a)
 a1=a1[:a1.find('.sif')]
 a1="/tmp/"+a1+'_'+"%d" % (random.randint(1,100))#a[:a.find('.sif')]
 a1=sys.argv[2]
+a1=a1[:a1.find('.')]
 if os.path.exists(a1):
 	print "error: %s already exists" % (a1)
 	sys.exit(1)
@@ -246,11 +261,16 @@ while len(unparsed)>0:
 	print "End parsing file %s..." % (filename)
 	file.close()
 
-Zip=zipfile.ZipFile(a1+'.zip', 'w')	
-zipfiles=os.listdir(a1)
-for zipname in zipfiles:
-	print "Add to archive --- "+a1+'/'+zipname
-	Zip.write(a1+'/'+zipname,zipname)
-	os.remove(a1+'/'+zipname)
-Zip.close()
-os.removedirs(a1)
+#Zip=zipfile.ZipFile(a1+'.zip', 'w')	
+#zipfiles=os.listdir(a1)
+#for zipname in filelist2:
+#	print "Add to archive --- "+a1+'/'+zipname
+#	Zip.write(zipname,zipname)
+#	os.remove(zipname)
+#for zipname in siflist2:
+#	print "Add to archive --- "+a1+'/'+zipname
+#	Zip.write(a1+'/'+zipname,zipname)
+#	os.remove(a1+'/'+zipname)
+
+#Zip.close()
+#os.removedirs(a1)
