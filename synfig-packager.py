@@ -132,6 +132,32 @@ def copy_image(inputt, outputt):
 	else:
 		return filelist_path[filelist.index(inputt)]
 #def lst(inputt, outputt):
+
+def copy_font(inputt, outputt):
+	print '\\\\\\\\ copy_font called ///////'
+	if not os.path.exists(outputt+'/font/'):
+				os.mkdir(outputt+'/font/')
+	if not inputt in filelist:
+		input_name=os.path.basename(inputt)
+		output_name=outputt+'/'+input_name
+		count1=0
+		while output_name in filelist2:
+			count1=count1+1
+			output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
+			output_name=output_name+input_name[input_name.find('.'):]
+		while output_name.find('/')<>-1:
+			output_name=output_name[output_name.find('/')+1:]
+		print '% ', output_name
+		filelist.append(inputt)
+		filelist2.append(output_name)
+		print '-------',inputt
+		output_name='font/'+output_name
+		shutil.copy(inputt, outputt+'/'+output_name)
+		filelist_path.append(output_name)
+		print '######### ',output_name
+		return output_name
+	else:
+		return filelist_path[filelist.index(inputt)]
 	
 	
 		
@@ -184,6 +210,7 @@ dname=a[:a.find(filename)]
 #fname=dirname
 #filedit(co)
 #sifparse(a)
+flag_font=False
 while len(unparsed)>0:
 	filepath=unparsed.pop()
 	print "Parsing file: %s" %(filepath)
@@ -209,6 +236,7 @@ while len(unparsed)>0:
 			file2.write(line)
 		elif line.find('</param>')<>-1:
 			flag_filename=False
+			flag_font=False
 			file2.write(line)
 		elif flag_filename and line.find('<string')<>-1:
 			print 'line=',line
@@ -270,6 +298,32 @@ while len(unparsed)>0:
 				result_filename=copy_sif(fn,a1)
 				#shutil.copy(fn, co)
 				file2.write(line[0:pos_use]+result_filename+line[pos_end_file:len(line)]+"\n")
+		elif line.find('<param name="family"')<>-1:
+			flag_font=True
+			file2.write(line)
+			print '---------------------------------------------'
+		elif flag_font and line.find('<string')<>-1 and line.find('.ttf')<>-1:
+			print 'line=',line
+			str=massiv[i]
+			pos1=str.find('>')+1
+			pos2=str.find('</string>')
+			#print "+++ ",str[pos1:pos2]
+			font_name=str[pos1:pos2]
+			#print "       Join input:",sifdir,fn 
+			fn=os.path.join(sifdir ,font_name)
+			#print "+++",sifdir,"___",fnamenotsif
+			fn=os.path.abspath(fn)
+			if fn.find('&#x')<>-1:
+				fn=decode_unicode_references(fn)
+				fn=fn.encode('utf-8')
+			if not fn in filelist:
+				print fn
+				fnamenotsif=os.path.basename(fn)  
+				co=a1+'/'+fnamenotsif
+			result_filename=copy_font(fn,a1)
+			print '************',result_filename
+			file2.write('<string>'+result_filename+'</string>'+"\n")
+			#filelist.append(fn)
 		else:
 			file2.write(line)
 	file2.close()
