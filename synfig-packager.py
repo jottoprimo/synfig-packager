@@ -88,7 +88,7 @@ def copy_image(inputt, outputt):
 	global lst_image_file
 	if not inputt in filelist:
 		input_name=os.path.basename(inputt)
-		output_name=input_name
+		output_name=outputt+'/'+input_name
 		count1=0
 		while output_name in filelist2:
 			count1=count1+1
@@ -97,6 +97,9 @@ def copy_image(inputt, outputt):
 		print '% ', output_name
 		filelist.append(inputt)
 		filelist2.append(output_name)
+		while output_name.find('/')<>-1:
+			output_name=output_name[output_name.find('/')+1:]
+			print '%%%%%% ', output_name
 		print '-------',inputt
 		shutil.copy(inputt, outputt+'/'+output_name)
 		lst_image_file=output_name
