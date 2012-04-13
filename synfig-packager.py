@@ -1,7 +1,7 @@
 #!python
 # -*- coding: utf-8 -*-
 
-import sys, os, shutil, re, zipfile, random
+import sys, os, shutil, re, zipfile, random, gzip
 
 global parslist
 
@@ -136,6 +136,15 @@ def copy_image(inputt, outputt):
 	
 		
 def copy_sif(inputt, outputt):
+	#if inputt.find('.sifz'):
+	#	sifz=gzip.open(inputt)
+	#	path = inputt
+	#	while path[len(path)-1]<>'/':
+	#		path=path[:len(path)-2]
+	#	sifz.read(path)
+	#	#print '------------- ',sifzfile
+	#	sifz.close()
+	#	inputt=inputt[:len(inputt)-1]
 	if not inputt in siflist:
 		input_name=os.path.basename(inputt)
 		output_name=input_name
@@ -180,7 +189,10 @@ while len(unparsed)>0:
 	print "Parsing file: %s" %(filepath)
 	parslist.append(filepath)
 	sifdir=filepath[:filepath.find(os.path.basename(filepath))]
-	file=open(filepath)
+	if filepath.find('.sifz')<>-1:
+		file=gzip.open(filepath)
+	else:
+		file=open(filepath)
 	filename=os.path.basename(filepath)
 	co=a1+'/'+filename
 	shutil.copy(a, co)
