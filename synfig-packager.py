@@ -13,6 +13,7 @@ filelist_path=[]
 zipfiles=[]
 siflist=[]
 siflist2=[]
+zip_dirs=[]
 lst_image_file=''
 #parslist2=[]
 
@@ -193,8 +194,12 @@ a=sys.argv[1]
 a1=os.path.basename(a)	
 a1=a1[:a1.find('.sif')]
 a1="/tmp/"+a1+'_'+"%d" % (random.randint(1,100))#a[:a.find('.sif')]
-a1=sys.argv[2]
-a1=a1[:a1.find('.')]
+a2=sys.argv[2]
+#if len(a2)>0:
+if a2.find('.zip')<>-1:
+	a1=a2[:len(a2)-4]
+else:
+	a1=a2
 if os.path.exists(a1):
 	print "error: %s already exists" % (a1)
 	sys.exit(1)
@@ -330,16 +335,28 @@ while len(unparsed)>0:
 	print "End parsing file %s..." % (filename)
 	file.close()
 
-#Zip=zipfile.ZipFile(a1+'.zip', 'w')	
-#zipfiles=os.listdir(a1)
-#for zipname in filelist2:
-#	print "Add to archive --- "+a1+'/'+zipname
-#	Zip.write(zipname,zipname)
-#	os.remove(zipname)
+Zip=zipfile.ZipFile(a1+'.zip', 'w')	
+zip_dirs.append(a1)
+while len(zip_dirs)>0:
+	zip_path=zip_dirs.pop()
+	print '++++++++++++++++++++ ', zip_path
+	zipfiles=os.listdir(zip_path)
+	for zipname in zipfiles:
+		if zipname.find('.')<>-1:
+			in_zip_path=zip_path[zip_path.find(a1):]
+			print "Add to archive --- "+zip_path+'/'+zipname
+			Zip.write(zip_path+'/'+zipname,in_zip_path+'/'+zipname)
+			os.remove(zip_path+'/'+zipname)
+		else:
+			print '------------------'
+			zip_dirs.append(zip_path+'/'+zipname)
+	#os.remove(zip_path)
+#Zip.write(a1,a1)
 #for zipname in siflist2:
 #	print "Add to archive --- "+a1+'/'+zipname
 #	Zip.write(a1+'/'+zipname,zipname)
 #	os.remove(a1+'/'+zipname)
 
-#Zip.close()
+Zip.close()
+shutil.rmtree(a1)
 #os.removedirs(a1)
