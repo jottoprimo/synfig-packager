@@ -129,6 +129,13 @@ def copy_image(inputt, outputt):
 		else:
 			filelist_path.append(output_name)
 		print '######### ',output_name
+		x=outputt[outputt.find(a1):]
+		x=x[x.find('/')+1:]
+		if x.find('/')==-1:
+			x=''
+		else:
+			x=x+'/'
+		info_file.write(inputt+"\n"+x+output_name+2*"\n")
 		return output_name
 	else:
 		return filelist_path[filelist.index(inputt)]
@@ -156,6 +163,7 @@ def copy_font(inputt, outputt):
 		shutil.copy(inputt, outputt+'/'+output_name)
 		filelist_path.append(output_name)
 		print '######### ',output_name
+		info_file.write(inputt+"\n"+output_name+2*"\n")
 		return output_name
 	else:
 		return filelist_path[filelist.index(inputt)]
@@ -183,6 +191,7 @@ def copy_sif(inputt, outputt):
 		siflist.append(inputt)
 		siflist2.append(output_name)
 		shutil.copy(inputt, outputt+'/'+output_name)
+		info_file.write(inputt+"\n"+output_name+2*"\n")
 		return output_name
 	else:
 		return siflist2[siflist.index(inputt)]
@@ -205,6 +214,7 @@ if os.path.exists(a1):
 	sys.exit(1)
 else:
 	os.mkdir(a1)
+info_file=open(a1+'/'+'info.info', 'w')
 
 unparsed.append(a)
 filename=os.path.basename(a)
@@ -334,6 +344,8 @@ while len(unparsed)>0:
 	file2.close()
 	print "End parsing file %s..." % (filename)
 	file.close()
+	
+info_file.close()
 
 Zip=zipfile.ZipFile(a1+'.zip', 'w')	
 zip_dirs.append(a1)
