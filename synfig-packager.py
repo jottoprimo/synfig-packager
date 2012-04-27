@@ -228,7 +228,7 @@ if os.path.exists(a1):
 	sys.exit(1)
 else:
 	os.mkdir(a1)
-info_file=open(a1+'/'+'info.i', 'w')
+info_file=open(a1+'/'+'info', 'w')
 
 unparsed.append(a)
 filename=os.path.basename(a)
@@ -367,14 +367,16 @@ while len(zip_dirs)>0:
 	print '++++++++++++++++++++ ', zip_path
 	zipfiles=os.listdir(zip_path)
 	for zipname in zipfiles:
-		if zipname.find('.')<>-1:
+		print os.path.isdir(a1+'/'+zipname)
+		if not os.path.isdir(a1+'/'+zipname):
 			in_zip_path=zip_path[zip_path.find(a1):]
 			print "Add to archive --- "+zip_path+'/'+zipname
 			Zip.write(zip_path+'/'+zipname,in_zip_path+'/'+zipname)
-			os.remove(zip_path+'/'+zipname)
-		else:
+			#os.remove(zip_path+'/'+zipname)
+		if os.path.isdir(a1+'/'+zipname):
 			print '------------------'
 			zip_dirs.append(zip_path+'/'+zipname)
+	print len(zip_dirs)
 	#os.remove(zip_path)
 #Zip.write(a1,a1)
 #for zipname in siflist2:
