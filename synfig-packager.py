@@ -84,7 +84,7 @@ def filedit(cname):
 				filedit(fname2)
 	file2.close()
 
-def copy_image(inputt, outputt):
+def copy_image(inputt, outputt, t):
 	print "=== Copy image called! ==="
 	global lst_image_file
 	if not inputt in filelist:
@@ -100,10 +100,18 @@ def copy_image(inputt, outputt):
 		filelist2.append(output_name)
 		while output_name.find('/')<>-1:
 			output_name=output_name[output_name.find('/')+1:]
-			print '%%%%%% ', output_name
+			#print '%%%%%% ', output_name
 		print '-------',inputt
-		shutil.copy(inputt, outputt+'/'+output_name)
+		if not t or  output_name.find('.lst')<>-1:
+			shutil.copy(inputt, outputt+'/'+output_name)
+		if t and output_name.find('.lst')==-1:
+			print '+++++++ ' ,t
+			if not os.path.exists(outputt+'/images/'):
+				os.mkdir(outputt+'/images/')
+			shutil.copy(inputt, outputt+'/images/'+output_name)
 		lst_image_file=output_name
+		if t and output_name.find('.lst')==-1:
+			output_name='images/'+output_name
 		if output_name.find('.lst')<>-1:
 			#file2.write('<string>'+output_name+'</string>'+"\n")
 			file_lst=open(inputt)
@@ -122,20 +130,25 @@ def copy_image(inputt, outputt):
 					#co=a1+'/'+image_name
 					#copy_image(image_path, a1)
 					print '+++' + image_path
-					file_lst_out.write(copy_image(image_path, output_path[:len(output_path)]) + "\n")
+					file_lst_out.write(copy_image(image_path, output_path[:len(output_path)], False) + "\n")
 					#shutil.copy(image_path, co)
 				else:
 					file_lst_out.write(image_name)
 		else:
 			filelist_path.append(output_name)
-		print '######### ',output_name
+		#print '######### ',output_name
 		x=outputt[outputt.find(a1):]
 		x=x[x.find('/')+1:]
 		if x.find('/')==-1:
 			x=''
 		else:
 			x=x+'/'
+		#if t and output_name.find('.lst')==-1:
+		#	print 'not_lst'
+		#	output_name='images/'+output_name
+		print '################# ', output_name
 		info_file.write(inputt+"\n"+x+output_name+2*"\n")
+		#filelist_path.append(output_name)
 		return output_name
 	else:
 		return filelist_path[filelist.index(inputt)]
@@ -143,8 +156,8 @@ def copy_image(inputt, outputt):
 
 def copy_font(inputt, outputt):
 	print '\\\\\\\\ copy_font called ///////'
-	if not os.path.exists(outputt+'/font/'):
-				os.mkdir(outputt+'/font/')
+	if not os.path.exists(outputt+'/fonts/'):
+				os.mkdir(outputt+'/fonts/')
 	if not inputt in filelist:
 		input_name=os.path.basename(inputt)
 		output_name=outputt+'/'+input_name
@@ -159,7 +172,7 @@ def copy_font(inputt, outputt):
 		filelist.append(inputt)
 		filelist2.append(output_name)
 		print '-------',inputt
-		output_name='font/'+output_name
+		output_name='fonts/'+output_name
 		shutil.copy(inputt, outputt+'/'+output_name)
 		filelist_path.append(output_name)
 		print '######### ',output_name
@@ -180,6 +193,7 @@ def copy_sif(inputt, outputt):
 	#	#print '------------- ',sifzfile
 	#	sifz.close()
 	#	inputt=inputt[:len(inputt)-1]
+	print '+-+-+-+-+-+-+-+-+-+-+-+-+-+- ', inputt in siflist, ' ',inputt
 	if not inputt in siflist:
 		input_name=os.path.basename(inputt)
 		output_name=input_name
@@ -214,7 +228,7 @@ if os.path.exists(a1):
 	sys.exit(1)
 else:
 	os.mkdir(a1)
-info_file=open(a1+'/'+'info.info', 'w')
+info_file=open(a1+'/'+'info.i', 'w')
 
 unparsed.append(a)
 filename=os.path.basename(a)
@@ -289,10 +303,9 @@ while len(unparsed)>0:
 				#				co=a1+'/'+image_name
 								#print '--- ',co
 				#				shutil.copy(image_path, co)
-			result_filename=copy_image(fn,a1)
-			print '************',result_filename
+			result_filename=copy_image(fn,a1, True)
+			print '1111************',result_filename,'<----->', filepath
 			file2.write('<string>'+result_filename+'</string>'+"\n")
-			#filelist.append(fn)
 		elif line.find('<param name="')<>-1 and line.find('use=')<>-1 and line.find('.sif')<>-1:
 			pos_param_name=line.find('<param name="')
 			pos_use=line.find('use="')+len('use="')
@@ -312,7 +325,7 @@ while len(unparsed)>0:
 				co=a1+'/'+fname
 				result_filename=copy_sif(fn,a1)
 				#shutil.copy(fn, co)
-				file2.write(line[0:pos_use]+result_filename+line[pos_end_file:len(line)]+"\n")
+				file2.write(line[:pos_use]+result_filename+line[pos_end_file:len(line)]+"\n")
 		elif line.find('<param name="family"')<>-1:
 			flag_font=True
 			file2.write(line)
