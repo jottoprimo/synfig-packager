@@ -85,7 +85,7 @@ def filedit(cname):
 	file2.close()
 
 def copy_image(inputt, outputt, t):
-	print "=== Copy image called! ==="
+	#print "=== Copy image called! ==="
 	global lst_image_file
 	if not inputt in filelist:
 		input_name=os.path.basename(inputt)
@@ -95,17 +95,18 @@ def copy_image(inputt, outputt, t):
 			count1=count1+1
 			output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
 			output_name=output_name+input_name[input_name.find('.'):]
-		print '% ', output_name
+		#print '% ', output_name
 		filelist.append(inputt)
 		filelist2.append(output_name)
 		while output_name.find('/')<>-1:
 			output_name=output_name[output_name.find('/')+1:]
 			#print '%%%%%% ', output_name
-		print '-------',inputt
-		if not t or  output_name.find('.lst')<>-1:
+		#print '-------',inputt
+		if not t: #or  output_name.find('.lst')<>-1:
 			shutil.copy(inputt, outputt+'/'+output_name)
+			#print '----------'
 		if t and output_name.find('.lst')==-1:
-			print '+++++++ ' ,t
+			#print '+++++++ ' ,t
 			if not os.path.exists(outputt+'/images/'):
 				os.mkdir(outputt+'/images/')
 			shutil.copy(inputt, outputt+'/images/'+output_name)
@@ -125,11 +126,11 @@ def copy_image(inputt, outputt, t):
 			lst_files=file_lst.readlines()
 			for ii, image_name in enumerate(lst_files):
 				if image_name.find('.')<>-1:
-					print "!!!",inputt
+					#print "!!!",inputt
 					image_path=inputt[:inputt.find('.lst')-len(input_name)+4]+image_name[:len(image_name)-1]
 					#co=a1+'/'+image_name
 					#copy_image(image_path, a1)
-					print '+++' + image_path
+					#print '+++' + image_path
 					file_lst_out.write(copy_image(image_path, output_path[:len(output_path)], False) + "\n")
 					#shutil.copy(image_path, co)
 				else:
@@ -146,7 +147,7 @@ def copy_image(inputt, outputt, t):
 		#if t and output_name.find('.lst')==-1:
 		#	print 'not_lst'
 		#	output_name='images/'+output_name
-		print '################# ', output_name
+		#print '################# ', output_name
 		info_file.write(inputt+"\n"+x+output_name+2*"\n")
 		#filelist_path.append(output_name)
 		return output_name
@@ -155,7 +156,7 @@ def copy_image(inputt, outputt, t):
 #def lst(inputt, outputt):
 
 def copy_font(inputt, outputt):
-	print '\\\\\\\\ copy_font called ///////'
+	#print '\\\\\\\\ copy_font called ///////'
 	if not os.path.exists(outputt+'/fonts/'):
 				os.mkdir(outputt+'/fonts/')
 	if not inputt in filelist:
@@ -168,14 +169,14 @@ def copy_font(inputt, outputt):
 			output_name=output_name+input_name[input_name.find('.'):]
 		while output_name.find('/')<>-1:
 			output_name=output_name[output_name.find('/')+1:]
-		print '% ', output_name
+		#print '% ', output_name
 		filelist.append(inputt)
 		filelist2.append(output_name)
-		print '-------',inputt
+		#print '-------',inputt
 		output_name='fonts/'+output_name
 		shutil.copy(inputt, outputt+'/'+output_name)
 		filelist_path.append(output_name)
-		print '######### ',output_name
+		#print '######### ',output_name
 		info_file.write(inputt+"\n"+output_name+2*"\n")
 		return output_name
 	else:
@@ -193,7 +194,7 @@ def copy_sif(inputt, outputt):
 	#	#print '------------- ',sifzfile
 	#	sifz.close()
 	#	inputt=inputt[:len(inputt)-1]
-	print '+-+-+-+-+-+-+-+-+-+-+-+-+-+- ', inputt in siflist, ' ',inputt
+	#print '+-+-+-+-+-+-+-+-+-+-+-+-+-+- ', inputt in siflist, ' ',inputt
 	if not inputt in siflist:
 		input_name=os.path.basename(inputt)
 		output_name=input_name
@@ -242,7 +243,8 @@ dname=a[:a.find(filename)]
 flag_font=False
 while len(unparsed)>0:
 	filepath=unparsed.pop()
-	print "Parsing file: %s" %(filepath)
+	#print "Parsing file: %s" %(filepath)
+	#print "Parsing file: %s" %(filepath)
 	parslist.append(filepath)
 	sifdir=filepath[:filepath.find(os.path.basename(filepath))]
 	if filepath.find('.sifz')<>-1:
@@ -268,7 +270,7 @@ while len(unparsed)>0:
 			flag_font=False
 			file2.write(line)
 		elif flag_filename and line.find('<string')<>-1:
-			print 'line=',line
+			#print 'line=',line
 			str=massiv[i]
 			pos1=str.find('>')+1
 			pos2=str.find('</string>')
@@ -288,7 +290,7 @@ while len(unparsed)>0:
 				fn=decode_unicode_references(fn)
 				fn=fn.encode('utf-8')
 			if not fn in filelist:
-				print fn
+				#print fn
 				fnamenotsif=os.path.basename(fn)  
 				co=a1+'/'+fnamenotsif
 				#print '+++ ', fn
@@ -304,7 +306,8 @@ while len(unparsed)>0:
 								#print '--- ',co
 				#				shutil.copy(image_path, co)
 			result_filename=copy_image(fn,a1, True)
-			print '1111************',result_filename,'<----->', filepath
+			#print '1111************',result_filename,'<----->', filepath
+			print fn,'--->',result_filename
 			file2.write('<string>'+result_filename+'</string>'+"\n")
 		elif line.find('<param name="')<>-1 and line.find('use=')<>-1 and line.find('.sif')<>-1:
 			pos_param_name=line.find('<param name="')
@@ -318,7 +321,7 @@ while len(unparsed)>0:
 			fname=line[pos_use:pos_end_file]
 			fn=os.path.join(dname, fname)
 			#print fname, '  ', dname
-			print fn
+			#print fn
 			if not fn in parslist:
 				unparsed.append(fn)
 				fname=os.path.basename(fname)
@@ -326,12 +329,13 @@ while len(unparsed)>0:
 				result_filename=copy_sif(fn,a1)
 				#shutil.copy(fn, co)
 				file2.write(line[:pos_use]+result_filename+line[pos_end_file:len(line)]+"\n")
+				print fn,'--->',result_filename
 		elif line.find('<param name="family"')<>-1:
 			flag_font=True
 			file2.write(line)
-			print '---------------------------------------------'
+			#print '---------------------------------------------'
 		elif flag_font and line.find('<string')<>-1 and line.find('.ttf')<>-1:
-			print 'line=',line
+			#print 'line=',line
 			str=massiv[i]
 			pos1=str.find('>')+1
 			pos2=str.find('</string>')
@@ -345,17 +349,18 @@ while len(unparsed)>0:
 				fn=decode_unicode_references(fn)
 				fn=fn.encode('utf-8')
 			if not fn in filelist:
-				print fn
+				#print fn
 				fnamenotsif=os.path.basename(fn)  
 				co=a1+'/'+fnamenotsif
 			result_filename=copy_font(fn,a1)
-			print '************',result_filename
+			#print '************',result_filename
 			file2.write('<string>'+result_filename+'</string>'+"\n")
 			#filelist.append(fn)
+			print fn,'--->',result_filename
 		else:
 			file2.write(line)
 	file2.close()
-	print "End parsing file %s..." % (filename)
+	#print "End parsing file %s..." % (filename)
 	file.close()
 	
 info_file.close()
@@ -364,19 +369,19 @@ Zip=zipfile.ZipFile(a1+'.zip', 'w')
 zip_dirs.append(a1)
 while len(zip_dirs)>0:
 	zip_path=zip_dirs.pop()
-	print '++++++++++++++++++++ ', zip_path
+	#print '++++++++++++++++++++ ', zip_path
 	zipfiles=os.listdir(zip_path)
 	for zipname in zipfiles:
-		print os.path.isdir(a1+'/'+zipname)
-		if not os.path.isdir(a1+'/'+zipname):
+		#print a1+'/'+zipname
+		if not os.path.isdir(zip_path+'/'+zipname):
 			in_zip_path=zip_path[zip_path.find(a1):]
 			print "Add to archive --- "+zip_path+'/'+zipname
 			Zip.write(zip_path+'/'+zipname,in_zip_path+'/'+zipname)
 			#os.remove(zip_path+'/'+zipname)
-		if os.path.isdir(a1+'/'+zipname):
-			print '------------------'
+		if os.path.isdir(zip_path+'/'+zipname):
+			#print '------------------'
 			zip_dirs.append(zip_path+'/'+zipname)
-	print len(zip_dirs)
+	#print len(zip_dirs)
 	#os.remove(zip_path)
 #Zip.write(a1,a1)
 #for zipname in siflist2:
