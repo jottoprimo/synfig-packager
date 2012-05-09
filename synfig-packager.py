@@ -217,8 +217,17 @@ def copy_sif(inputt, outputt):
 a=sys.argv[1]
 a1=os.path.basename(a)	
 a1=a1[:a1.find('.sif')]
-a1="/tmp/"+a1+'_'+"%d" % (random.randint(1,100))#a[:a.find('.sif')]
-a2=sys.argv[2]
+a1="/tmp/"+a1#"%d" % (random.randint(1,100))#a[:a.find('.sif')]
+prefix=''
+if len(sys.argv)==3:
+	a2=sys.argv[2]
+else:
+	prefix='/tmp/'
+	a1=a1[5:]
+	a2=a1
+
+
+	
 #if len(a2)>0:
 if a2.find('.zip')<>-1:
 	a1=a2[:len(a2)-4]
@@ -365,7 +374,8 @@ while len(unparsed)>0:
 	
 info_file.close()
 
-Zip=zipfile.ZipFile(a1+'.zip', 'w')	
+
+Zip=zipfile.ZipFile(prefix+a1+'.zip', 'w')	
 zip_dirs.append(a1)
 while len(zip_dirs)>0:
 	zip_path=zip_dirs.pop()
