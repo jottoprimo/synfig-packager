@@ -222,7 +222,7 @@ prefix=''
 if len(sys.argv)==3:
 	a2=sys.argv[2]
 else:
-	prefix='/tmp/'
+	#prefix='/tmp/'
 	a1=a1[5:]
 	a2=a1
 
