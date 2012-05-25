@@ -225,7 +225,11 @@ def copy_sif(inputt, outputt):
 		else:
 			return siflist2[siflist.index(inputt)]
 		
-
+if len(sys.argv)==1:
+	print ''
+	print 'USAGE: synfig-packager.py FILENAME.sif'
+	print ''
+	sys.exit(1)
 a=sys.argv[1]
 a1=os.path.basename(a)	
 a1=a1[:a1.find('.sif')]
