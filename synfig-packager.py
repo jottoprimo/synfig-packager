@@ -1,7 +1,7 @@
 #!python
 # -*- coding: utf-8 -*-
 
-import sys, os, shutil, re, zipfile, random, gzip
+import sys, os, shutil, re, zipfile, random, gzip, tempfile
 
 global parslist
 
@@ -87,100 +87,108 @@ def filedit(cname):
 def copy_image(inputt, outputt, t):
 	#print "=== Copy image called! ==="
 	global lst_image_file
-	if not inputt in filelist:
-		input_name=os.path.basename(inputt)
-		output_name=outputt+'/'+input_name
-		count1=0
-		while output_name in filelist2:
-			count1=count1+1
-			output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
-			output_name=output_name+input_name[input_name.find('.'):]
-		#print '% ', output_name
-		filelist.append(inputt)
-		filelist2.append(output_name)
-		while output_name.find('/')<>-1:
-			output_name=output_name[output_name.find('/')+1:]
-			#print '%%%%%% ', output_name
-		#print '-------',inputt
-		if not t: #or  output_name.find('.lst')<>-1:
-			shutil.copy(inputt, outputt+'/'+output_name)
-			#print '----------'
-		if t and output_name.find('.lst')==-1:
-			#print '+++++++ ' ,t
-			if not os.path.exists(outputt+'/images/'):
-				os.mkdir(outputt+'/images/')
-			shutil.copy(inputt, outputt+'/images/'+output_name)
-		lst_image_file=output_name
-		if t and output_name.find('.lst')==-1:
-			output_name='images/'+output_name
-		if output_name.find('.lst')<>-1:
-			#file2.write('<string>'+output_name+'</string>'+"\n")
-			file_lst=open(inputt)
-			if not os.path.exists(outputt+'/sequences/'):
-				os.mkdir(outputt+'/sequences/')
-			output_path=outputt+'/sequences/'+output_name[:output_name.find('.')]
-			os.mkdir(outputt+'/sequences/'+output_name[:output_name.find('.')]+'/')
-			output_name='sequences/'+output_name[:output_name.find('.')]+'/'+output_name
-			filelist_path.append(output_name)
-			file_lst_out=open(outputt+'/'+output_name, 'w')
-			lst_files=file_lst.readlines()
-			for ii, image_name in enumerate(lst_files):
-				if image_name.find('.')<>-1:
-					#print "!!!",inputt
-					image_path=inputt[:inputt.find('.lst')-len(input_name)+4]+image_name[:len(image_name)-1]
-					#co=a1+'/'+image_name
-					#copy_image(image_path, a1)
-					#print '+++' + image_path
-					file_lst_out.write(copy_image(image_path, output_path[:len(output_path)], False) + "\n")
-					#shutil.copy(image_path, co)
-				else:
-					file_lst_out.write(image_name)
-		else:
-			filelist_path.append(output_name)
-		#print '######### ',output_name
-		x=outputt[outputt.find(a1):]
-		x=x[x.find('/')+1:]
-		if x.find('/')==-1:
-			x=''
-		else:
-			x=x+'/'
-		#if t and output_name.find('.lst')==-1:
-		#	print 'not_lst'
-		#	output_name='images/'+output_name
-		#print '################# ', output_name
-		info_file.write(inputt+"\n"+x+output_name+2*"\n")
-		#filelist_path.append(output_name)
-		return output_name
+	if not os.path.exists(inputt):
+		print 'Warning! File "', inputt, '"', 'not found';
+		return ''
 	else:
-		return filelist_path[filelist.index(inputt)]
+		if not inputt in filelist:
+			input_name=os.path.basename(inputt)
+			output_name=outputt+'/'+input_name
+			count1=0
+			while output_name in filelist2:
+				count1=count1+1
+				output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
+				output_name=output_name+input_name[input_name.find('.'):]
+			#print '% ', output_name
+			filelist.append(inputt)
+			filelist2.append(output_name)
+			while output_name.find('/')<>-1:
+				output_name=output_name[output_name.find('/')+1:]
+				#print '%%%%%% ', output_name
+			#print '-------',inputt
+			if not t: #or  output_name.find('.lst')<>-1:
+				shutil.copy(inputt, outputt+'/'+output_name)
+				#print '----------'
+			if t and output_name.find('.lst')==-1:
+				#print '+++++++ ' ,t
+				if not os.path.exists(outputt+'/images/'):
+					os.mkdir(outputt+'/images/')
+				shutil.copy(inputt, outputt+'/images/'+output_name)
+			lst_image_file=output_name
+			if t and output_name.find('.lst')==-1:
+				output_name='images/'+output_name
+			if output_name.find('.lst')<>-1:
+				#file2.write('<string>'+output_name+'</string>'+"\n")
+				file_lst=open(inputt)
+				if not os.path.exists(outputt+'/sequences/'):
+					os.mkdir(outputt+'/sequences/')
+				output_path=outputt+'/sequences/'+output_name[:output_name.find('.')]
+				os.mkdir(outputt+'/sequences/'+output_name[:output_name.find('.')]+'/')
+				output_name='sequences/'+output_name[:output_name.find('.')]+'/'+output_name
+				filelist_path.append(output_name)
+				file_lst_out=open(outputt+'/'+output_name, 'w')
+				lst_files=file_lst.readlines()
+				for ii, image_name in enumerate(lst_files):
+					if image_name.find('.')<>-1:
+						#print "!!!",inputt
+						image_path=inputt[:inputt.find('.lst')-len(input_name)+4]+image_name[:len(image_name)-1]
+						#co=a1+'/'+image_name
+						#copy_image(image_path, a1)
+						#print '+++' + image_path
+						file_lst_out.write(copy_image(image_path, output_path[:len(output_path)], False) + "\n")
+						#shutil.copy(image_path, co)
+					else:
+						file_lst_out.write(image_name)
+			else:
+				filelist_path.append(output_name)
+			#print '######### ',output_name
+			x=outputt[outputt.find(a1):]
+			x=x[x.find('/')+1:]
+			if x.find('/')==-1:
+				x=''
+			else:
+				x=x+'/'
+			#if t and output_name.find('.lst')==-1:
+			#	print 'not_lst'
+			#	output_name='images/'+output_name
+			#print '################# ', output_name
+			info_file.write(inputt+"\n"+x+output_name+2*"\n")
+			#filelist_path.append(output_name)
+			return output_name
+		else:
+			return filelist_path[filelist.index(inputt)]
 #def lst(inputt, outputt):
 
 def copy_font(inputt, outputt):
 	#print '\\\\\\\\ copy_font called ///////'
-	if not os.path.exists(outputt+'/fonts/'):
-				os.mkdir(outputt+'/fonts/')
-	if not inputt in filelist:
-		input_name=os.path.basename(inputt)
-		output_name=outputt+'/'+input_name
-		count1=0
-		while output_name in filelist2:
-			count1=count1+1
-			output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
-			output_name=output_name+input_name[input_name.find('.'):]
-		while output_name.find('/')<>-1:
-			output_name=output_name[output_name.find('/')+1:]
-		#print '% ', output_name
-		filelist.append(inputt)
-		filelist2.append(output_name)
-		#print '-------',inputt
-		output_name='fonts/'+output_name
-		shutil.copy(inputt, outputt+'/'+output_name)
-		filelist_path.append(output_name)
-		#print '######### ',output_name
-		info_file.write(inputt+"\n"+output_name+2*"\n")
-		return output_name
+	if not os.path.exists(inputt):
+		print 'Warning! File "', inputt, '"', 'not found';
+		return ''
 	else:
-		return filelist_path[filelist.index(inputt)]
+		if not os.path.exists(outputt+'/fonts/'):
+					os.mkdir(outputt+'/fonts/')
+		if not inputt in filelist:
+			input_name=os.path.basename(inputt)
+			output_name=outputt+'/'+input_name
+			count1=0
+			while output_name in filelist2:
+				count1=count1+1
+				output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
+				output_name=output_name+input_name[input_name.find('.'):]
+			while output_name.find('/')<>-1:
+				output_name=output_name[output_name.find('/')+1:]
+			#print '% ', output_name
+			filelist.append(inputt)
+			filelist2.append(output_name)
+			#print '-------',inputt
+			output_name='fonts/'+output_name
+			shutil.copy(inputt, outputt+'/'+output_name)
+			filelist_path.append(output_name)
+			#print '######### ',output_name
+			info_file.write(inputt+"\n"+output_name+2*"\n")
+			return output_name
+		else:
+			return filelist_path[filelist.index(inputt)]
 	
 	
 		
@@ -195,23 +203,27 @@ def copy_sif(inputt, outputt):
 	#	sifz.close()
 	#	inputt=inputt[:len(inputt)-1]
 	#print '+-+-+-+-+-+-+-+-+-+-+-+-+-+- ', inputt in siflist, ' ',inputt
-	if not inputt in siflist:
-		input_name=os.path.basename(inputt)
-		output_name=input_name
-		count1=0
-		while output_name in siflist2:
-			count1=count1+1
-			output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
-			output_name=output_name+input_name[input_name.find('.'):]
-		siflist.append(inputt)
-		siflist2.append(output_name)
-		shutil.copy(inputt, outputt+'/'+output_name)
-		info_file.write(inputt+"\n"+output_name+2*"\n")
-		return output_name
+	if not os.path.exists(inputt):
+		print 'Warning! File "',inputt,'"', 'not found';
+		return ''
 	else:
-		return siflist2[siflist.index(inputt)]
-		
-		
+		unparsed.append(inputt)
+		if not inputt in siflist:
+			print '----'
+			input_name=os.path.basename(inputt)
+			output_name=input_name
+			count1=0
+			while output_name in siflist2:
+				count1=count1+1
+				output_name=input_name[:input_name.find('.')] +'-'+ '%d' % count1
+				output_name=output_name+input_name[input_name.find('.'):]
+			siflist.append(inputt)
+			siflist2.append(output_name)
+			shutil.copy(inputt, outputt+'/'+output_name)
+			info_file.write(inputt+"\n"+output_name+2*"\n")
+			return output_name
+		else:
+			return siflist2[siflist.index(inputt)]
 		
 
 a=sys.argv[1]
@@ -332,13 +344,13 @@ while len(unparsed)>0:
 			#print fname, '  ', dname
 			#print fn
 			if not fn in parslist:
-				unparsed.append(fn)
 				fname=os.path.basename(fname)
 				co=a1+'/'+fname
 				result_filename=copy_sif(fn,a1)
-				#shutil.copy(fn, co)
-				file2.write(line[:pos_use]+result_filename+line[pos_end_file:len(line)]+"\n")
-				print fn,'--->',result_filename
+				#shutil.copy(fn, co)-
+				if result_filename<>'':
+					file2.write(line[:pos_use]+result_filename+line[pos_end_file:len(line)]+"\n")
+					print fn,'--->',result_filename
 		elif line.find('<param name="family"')<>-1:
 			flag_font=True
 			file2.write(line)
