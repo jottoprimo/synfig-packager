@@ -230,6 +230,7 @@ a=sys.argv[1]
 a1=os.path.basename(a)	
 a1=a1[:a1.find('.sif')]
 a1="/tmp/"+a1#"%d" % (random.randint(1,100))#a[:a.find('.sif')]
+tempdir=tempfile.mkdtemp()
 prefix=''
 if len(sys.argv)==3:
 	a2=sys.argv[2]
@@ -245,12 +246,12 @@ if a2.find('.zip')<>-1:
 	a1=a2[:len(a2)-4]
 else:
 	a1=a2
-if os.path.exists(a1):
-	print "error: %s already exists" % (a1)
-	sys.exit(1)
-else:
-	os.mkdir(a1)
-info_file=open(a1+'/'+'info', 'w')
+#if os.path.exists(a1):
+#	print "error: %s already exists" % (a1)
+#	sys.exit(1)
+#else:
+#	os.mkdir(a1)
+info_file=open(tempdir+'/'+'info', 'w')
 
 unparsed.append(a)
 filename=os.path.basename(a)
@@ -262,6 +263,8 @@ dname=a[:a.find(filename)]
 #filedit(co)
 #sifparse(a)
 flag_font=False
+os.mkdir(tempdir+'/'+a1)
+tempdir=tempdir+'/'+a1
 while len(unparsed)>0:
 	filepath=unparsed.pop()
 	#print "Parsing file: %s" %(filepath)
@@ -273,14 +276,14 @@ while len(unparsed)>0:
 	else:
 		file=open(filepath)
 	filename=os.path.basename(filepath)
-	co=a1+'/'+filename
+	co=tempdir+'/'+filename
 	shutil.copy(a, co)
 	flag_filename=False
 	#fname=a[:a.find(filename)]
 	fname=filename
 	#a1="/tmp/"+os.path.basename(a1)
 	#print "---",a1+'/'+fname
-	file2=open(a1+'/'+fname, 'w')
+	file2=open(tempdir+'/'+fname, 'w')
 	massiv=file.readlines()
 	for i, line in enumerate(massiv):
 		if line.find('<param name="filename">')<>-1:
@@ -313,7 +316,7 @@ while len(unparsed)>0:
 			if not fn in filelist:
 				#print fn
 				fnamenotsif=os.path.basename(fn)  
-				co=a1+'/'+fnamenotsif
+				co=tempdir+'/'+fnamenotsif
 				#print '+++ ', fn
 				#print 'aa'+co
 				#shutil.copy(fn, co)
@@ -326,7 +329,7 @@ while len(unparsed)>0:
 				#				co=a1+'/'+image_name
 								#print '--- ',co
 				#				shutil.copy(image_path, co)
-			result_filename=copy_image(fn,a1, True)
+			result_filename=copy_image(fn,tempdir, True)
 			#print '1111************',result_filename,'<----->', filepath
 			print fn,'--->',result_filename
 			file2.write('<string>'+result_filename+'</string>'+"\n")
@@ -345,8 +348,8 @@ while len(unparsed)>0:
 			#print fn
 			if not fn in parslist:
 				fname=os.path.basename(fname)
-				co=a1+'/'+fname
-				result_filename=copy_sif(fn,a1)
+				co=tempdir+'/'+fname
+				result_filename=copy_sif(fn,tempdir)
 				#shutil.copy(fn, co)-
 				if result_filename<>'':
 					file2.write(line[:pos_use]+result_filename+line[pos_end_file:len(line)]+"\n")
@@ -372,8 +375,8 @@ while len(unparsed)>0:
 			if not fn in filelist:
 				#print fn
 				fnamenotsif=os.path.basename(fn)  
-				co=a1+'/'+fnamenotsif
-			result_filename=copy_font(fn,a1)
+				co=tempdir+'/'+fnamenotsif
+			result_filename=copy_font(fn,tempdir)
 			#print '************',result_filename
 			file2.write('<string>'+result_filename+'</string>'+"\n")
 			#filelist.append(fn)
@@ -388,7 +391,7 @@ info_file.close()
 
 
 Zip=zipfile.ZipFile(prefix+a1+'.zip', 'w')	
-zip_dirs.append(a1)
+zip_dirs.append(tempdir)
 while len(zip_dirs)>0:
 	zip_path=zip_dirs.pop()
 	#print '++++++++++++++++++++ ', zip_path
@@ -412,5 +415,5 @@ while len(zip_dirs)>0:
 #	os.remove(a1+'/'+zipname)
 
 Zip.close()
-shutil.rmtree(a1)
+shutil.rmtree(tempdir)
 #os.removedirs(a1)
